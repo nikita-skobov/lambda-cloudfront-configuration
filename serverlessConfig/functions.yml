@@ -2,7 +2,7 @@ functions:
   root:
     timeout: 15
     memorySize: 1024
-    handler: ${opt:root-handler, "./handlers/root.handler"}
+    handler: ${opt:root-handler, "handlers/root.handler"}
     # role: rootRole
     environment:
       REGION: ${self:provider.region}
