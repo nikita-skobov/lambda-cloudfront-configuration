@@ -26,17 +26,17 @@ package:
 custom:
   # policies: ${file(./serverlessConfig/policies.yml):policies}
 
-  # api-distribution:
-  #   origin-path: "/${self:provider.stage}"
-  #   certid: ${opt:certid}
-  #   hostedzonename: ${opt:hzname} #eg: mywebsite.com
-  #   alias: ${opt:api-alias} #eg: mywebsite.com OR something.mywebsite.com
-  #   api-key-value: ${opt:api-key-value}
-  #   error-cache-ttl: 2
-  #   logbucket: "${opt:logbucket}.s3.amazonaws.com"
-  #   logbucket-prefix: "${self:custom.api-distribution.alias}-${self:provider.stage}"
+  api-distribution:
+    origin-path: "/${self:provider.stage}"
+    certid: ${opt:certid}
+    hostedzonename: ${opt:hzname} #eg: mywebsite.com
+    alias: ${opt:alias} #eg: mywebsite.com OR something.mywebsite.com
+    api-key-value: ${opt:api-key-value}
+    error-cache-ttl: 2
+    # logbucket: "${opt:logbucket}.s3.amazonaws.com"
+    # logbucket-prefix: "${self:custom.api-distribution.alias}-${self:provider.stage}"
 
 functions: ${file(./serverlessConfig/functions.yml):functions}
 
-# resources:
-#   Resources: ${file(./serverlessConfig/resources.yml):Resources}
+resources:
+  Resources: ${file(./serverlessConfig/resources.yml):Resources}
