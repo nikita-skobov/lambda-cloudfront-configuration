@@ -1,27 +1,15 @@
-variables:
-  timeouts:
-    root: 30
-  memorySizes:
-    root: 1024
-  handlers:
-    root: ${opt:root-handler, "./handlers/root.handler"}
-  environmentVars:
-    root:
-      REGION: ${self:provider.region}
-  paths:
-    root: "/"
-
 functions:
   root:
-    timeout: ${self:custom.functionVariables.timeouts.root, ${self:custom.defaultTimeout}}
-    memorySize: ${self:custom.functionVariables.memorySizes.root, ${self:custom.defaultMemory}}
-    handler: ${self:custom.functionVariables.handlers.root}
-    role: rootRole
-    environment: ${self:custom.functionVariables.environmentVars.root}
+    timeout: 15
+    memorySize: 1024
+    handler: ${opt:root-handler, "./handlers/root.handler"}
+    # role: rootRole
+    environment:
+      REGION: ${self:provider.region}
 
     events:
       - http:
-          path: ${self:custom.functionVariables.paths.root}
+          path: ${opt:root-path, "/"}
           method: GET
           ## use private: true if you want to restrict access to this function via an API key that
           ## is checked for you automatically by API Gateway. This is used to only allow CloudFront
