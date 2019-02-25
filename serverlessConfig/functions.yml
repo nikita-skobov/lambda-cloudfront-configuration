@@ -17,4 +17,4 @@ functions:
           ## execute URL that API Gateway generates
           private: true
           ## use cors true to allow requests made to this API by clients on a different domain
-          cors: true
+          # cors: true
