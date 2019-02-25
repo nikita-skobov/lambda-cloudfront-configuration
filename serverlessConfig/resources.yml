@@ -83,7 +83,13 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
         ## The certificate to use when viewers use HTTPS to request objects.
         ViewerCertificate:
-          AcmCertificateArn: "arn:aws:acm:us-east-1:${self:custom.account}:certificate/${self:custom.api-distribution.certid}"
+          AcmCertificateArn: 
+            Fn::Join:
+              - "" # empty string as the delimiter
+              # join the next 3 lines together and in order:
+              - - "arn:aws:acm:us-east-1:"
+                - Ref: AWS::AccountId
+                - ":certificate/${self:custom.api-distribution.certid}"
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.1_2016
         # Logging:
