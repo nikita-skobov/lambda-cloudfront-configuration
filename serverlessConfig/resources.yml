@@ -86,7 +86,7 @@ Resources:
           AcmCertificateArn: "arn:aws:acm:us-east-1:${self:custom.account}:certificate/${self:custom.api-distribution.certid}"
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.1_2016
-        Logging:
-          IncludeCookies: 'false'
-          Bucket: ${self:custom.api-distribution.logbucket}
-          Prefix: ${self:custom.api-distribution.logbucket-prefix} #"api-${self:provider.stage}-${self:service}"
+        # Logging:
+        #   IncludeCookies: 'false'
+        #   Bucket: ${self:custom.api-distribution.logbucket}
+        #   Prefix: ${self:custom.api-distribution.logbucket-prefix} #"api-${self:provider.stage}-${self:service}"
