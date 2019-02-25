@@ -1,0 +1,75 @@
+variables:
+  timeouts:
+    root: 30
+  memorySizes:
+    root: 1024
+  handlers:
+    root: ${opt:root-handler, "./handlers/root.handler"}
+  environmentVars:
+    root:
+      REGION: ${self:provider.region}
+  paths:
+    root: "/"
+
+functions:
+  root:
+    timeout: ${self:custom.functionVariables.timeouts.root, ${self:custom.defaultTimeout}}
+    memorySize: ${self:custom.functionVariables.memorySizes.root, ${self:custom.defaultMemory}}
+    handler: ${self:custom.functionVariables.handlers.root}
+    role: rootRole
+    environment: ${self:custom.functionVariables.environmentVars.root}
+
+    events:
+      - http:
+          path: ${self:custom.functionVariables.paths.root}
+          method: GET
+          ## use private: true if you want to restrict access to this function via an API key that
+          ## is checked for you automatically by API Gateway. This is used to only allow CloudFront
+          ## to access our lambda functions, and prevent people from simply going to the lambda
+          ## execute URL that API Gateway generates
+          private: true
+          ## use cors true to allow requests made to this API by clients on a different domain
+          cors: true
+
+#   s3Uploaded:
+#     timeout: ${self:custom.timeout}
+#     memorySize: ${self:custom.memorySize}
+#     handler: ${self:custom.uploadedHandler}
+#     role: s3UploadedRole # must match the logical name of the IAM role resource, not the physical ID
+#     environment:
+#       # Environment variables that are set when your function is triggered.
+#       # add, or remove these variables as needed
+#       REGION: ${self:provider.region}
+#       OUTPUT_BUCKET: ${self:custom.outputBucketName}
+#       MAX_UPLOAD_SIZE: ${self:custom.maxUploadSize}
+#       TABLE_NAME: ${self:custom.dynamoTableName}
+#       PARTITION_KEY: ${self:custom.dynamoPartitionKeyName}
+#     events:
+#       # uploadbucket is the logical id used by cloudformation, not the
+#       # actual bucket name.
+#       - s3: uploadbucket
+#     ## Uncomment the following if you want to use a DLQ in case lambda fails to process your upload
+#     ## make sure you have a resource called LambdaDLQTopic (or change the name to whatever resource you are
+#     ## using as your DLQ)
+#     # onError:
+#     #   Ref: LambdaDLQTopic
+
+#   polling:
+#     timeout: ${self:custom.timeout}
+#     memorySize: ${self:custom.memorySize}
+#     handler: ${self:custom.pollingHandler}
+#     role: pollingRole
+#     environment:
+#       REGION: ${self:provider.region}
+#       TABLE_NAME: ${self:custom.dynamoTableName}
+#       PARTITION_KEY: ${self:custom.dynamoPartitionKeyName}
+#     events:
+#       - http:
+#           path: ${self:custom.pollingPath}
+#           method: GET
+#           ## use private: true if you want to restrict access to this function via an API key that
+#           ## is checked for you automatically by API Gateway
+#           # private: true
+#           ## use cors true to allow requests made to this API by clients on a different domain
+#           cors: true
+  

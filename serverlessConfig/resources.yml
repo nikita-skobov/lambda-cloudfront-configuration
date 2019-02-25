@@ -1,0 +1,92 @@
+Resources:
+  ApiWebAppRecord:
+    DependsOn:
+      - ApiCloudFrontDistribution
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName:
+          Fn::GetAtt:
+            - ApiCloudFrontDistribution
+            - DomainName
+        HostedZoneId: Z2FDTNDATAQYW2 # I think this is the same for all cloudfront distributions
+      HostedZoneName: "${self:custom.api-distribution.hostedzonename}."
+      Name: "${self:custom.api-distribution.alias}."
+      Type: 'A'
+
+  ApiCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        HttpVersion: "http2"
+        Origins:
+          - DomainName:
+              Fn::Join:
+                - ""
+                - - Ref: "ApiGatewayRestApi"
+                  - ".execute-api.${self:provider.region}.amazonaws.com"
+            ## An identifier for the origin which must be unique within the distribution
+            OriginPath: ${self:custom.api-distribution.origin-path} #"/${self:provider.stage}"
+            Id: "lambdaid=${self:provider.stage}-${self:service}"
+            OriginCustomHeaders:
+              - HeaderName: x-api-key
+                ## the header value should be the same as the api key that serverless generates for you
+                ## As far as I'm aware, you cannot reference the api key's value even if you create the
+                ## key with your own cloudformation resources (instead of letting serverless create
+                ## the key for you.) This documentation page:
+                ## https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-apikey.html
+                ## says that the only return value for the apikey is the logical ID. If that changes in the future
+                ## please file an issue.
+                ## so for now, you must deploy once, and let serverless create the api key for you
+                ## then manually add that api key to your serverless.yml file (or pass it in as a parameter)
+                ## and deploy again.
+                HeaderValue: ${self:custom.api-distribution.api-key-value}
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+        Enabled: 'true'
+        Aliases:
+          - ${self:custom.api-distribution.alias} # "api.${self:service}.com"
+        ## by default cloudfront uses a 5 minute error caching... I dont believe
+        ## errors should be cached. If you want errors to be cached, simply comment out the
+        ## following block
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 500
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 400
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 403
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 405
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 414
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 501
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 502
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 503
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+          - ErrorCode: 504
+            ErrorCachingMinTTL: ${self:custom.api-distribution.error-cache-ttl}
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - HEAD
+            - GET
+            - OPTIONS
+          ForwardedValues:
+            QueryString: 'false'
+          TargetOriginId: "lambdaid=${self:provider.stage}-${self:service}"
+          ViewerProtocolPolicy: redirect-to-https
+        ## The certificate to use when viewers use HTTPS to request objects.
+        ViewerCertificate:
+          AcmCertificateArn: "arn:aws:acm:us-east-1:${self:custom.account}:certificate/${self:custom.api-distribution.certid}"
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.1_2016
+        Logging:
+          IncludeCookies: 'false'
+          Bucket: ${self:custom.api-distribution.logbucket}
+          Prefix: ${self:custom.api-distribution.logbucket-prefix} #"api-${self:provider.stage}-${self:service}"

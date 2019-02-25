@@ -1,0 +1,46 @@
+service: ${opt:service, "lambda-cloudfront-configuration"}
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, "staging"}
+  region: ${opt:region, "us-east-1"}
+  # the default endpointType is EDGE which means API Gateway
+  # creates a cloudfront distribution for you that you dont get to manage.
+  # however, we want to make our own cloudfront distribution to use a custom domain, so we
+  # tell API Gateway to use a REGIONAL endpoint meaning there is no hidden cloudfront distribution
+  endpointType: REGIONAL
+  apiKeys:
+    ## after serverless deploy, serverless will tell you the api key
+    ## that it generated for the given api name. You would then use this generated
+    ## api key inside your other resources so they have access to your api
+    - "${self:service}-${self:provider.stage}"
+package:
+  exclude:
+    - LICENSE
+    - README.md
+    - serverlessConfig/**
+    # # the following is an example of how to exclude all node_modules except
+    # # for the ones you want
+    # - node_modules/**
+    # - '!node_modules/uuid/**'
+custom:
+  defaultTimeout: 30
+  defaultMemory: 1024
+  functionVariables: ${file(./serverlessConfig/functions.yml):variables}
+
+  # policies: ${file(./serverlessConfig/policies.yml):policies}
+
+  api-distribution:
+    origin-path: "/${self:provider.stage}"
+    certid: ${opt:certid}
+    hostedzonename: "popithere.com"
+    alias: ${opt:api-alias}
+    api-key-value: ${opt:api-key-value}
+    error-cache-ttl: 2
+    logbucket: "${opt:logbucket}.s3.amazonaws.com"
+    logbucket-prefix: "${self:custom.api-distribution.alias}-${self:provider.stage}"
+
+functions: ${file(./serverlessConfig/functions.yml):functions}
+
+resources:
+  Resources: ${file(./serverlessConfig/resources.yml):Resources}
