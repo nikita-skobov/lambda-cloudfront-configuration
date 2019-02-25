@@ -7,7 +7,7 @@ module.exports.handler = async (event, context) => {
   let headers = {
     'Content-Type': 'application/json',
     // USE one of the following for CORS. either a specific domain, or all domains
-    'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+    // 'Access-Control-Allow-Origin': '*', // Required for CORS support to work
     // 'Access-Control-Allow-Origin': `https://${process.env.DOMAIN}.com`, // Required for CORS support to work
 
     // USE the following if you have a private API that needs an authorization header
@@ -31,7 +31,9 @@ module.exports.handler = async (event, context) => {
     <title>Document</title>
     </head>
     <body>
-    <p>test, test, test</p>
+    <h1>Test</h1>
+    <p>Your ip: ${JSON.stringify(event.headers['X-Forwarded-For'])}</p>
+    <p>Server time: ${new Date()}</p>
     </body>
     </html>
     `
