@@ -14,7 +14,7 @@ module.exports.handler = async (event, context) => {
     // 'Access-Control-Allow-Credentials': true, // Required for authorization headers with HTTPS
 
     // cache as needed, or otherwise comment this, and use CloudFronts default cache time
-    'Cache-Control': 'max-age=2',
+    'Cache-Control': 'max-age=20',
   }
 
   try {
@@ -32,7 +32,6 @@ module.exports.handler = async (event, context) => {
     </head>
     <body>
     <h1>Test</h1>
-    <p>Your ip: ${JSON.stringify(event.headers['X-Forwarded-For'])}</p>
     <p>Server time: ${new Date()}</p>
     </body>
     </html>
