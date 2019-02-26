@@ -74,3 +74,7 @@ An example deployment command might look like:
 ```sh
 sls deploy --certid 00925a3a-1d59-46b8-ad34-4c36b1256064 --hzname mywebsite.com --alias mywebsite.com --api-key-value NR6Kc5Swf12qyBOABvliN2fCHozuhtGI1InPTRd6
 ```
+
+## What's next?
+
+This repository offers a starting point for setting up a website that gets rendered on the server side. The placeholder implementation located in handlers/root.js is an example implementation that simply returns an html string. There are many ways to return rendered html such as react, emberJS, vueJS, pug, etc etc.
